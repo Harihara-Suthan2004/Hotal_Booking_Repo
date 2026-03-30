@@ -1,0 +1,25 @@
+@import "tailwindcss";
+body{
+    background:rgb(14,13,12);
+    color:white;
+}
+.bg{
+    background: rgb(26,27,28);
+}
+.bg2{
+    background: rgb(14,13,12);;
+}
+/* .bg3{
+    background-image: repeating-linear-gradient(135deg,hsla(146,0%,0%,0.15) 0px, hsla(146,0%,0%,0.15) 0px, transparent 0px, transparent 1px, hsla(146,0%,0%,0.15) 1px, hsla(146,0%,0%,0.15) 4px, transparent 4px, transparent 5px, hsla(146,0%,0%,0.15) 5px,hsla(146,0,));
+} */
+
+.bg3{
+    background-color: rgb(14,13,12);
+    background-image: repeating-linear-gradient(
+        135deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 6px
+    );
+}
