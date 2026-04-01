@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import {  } from 'react'
 
 import './App.css'
 import Hero from './Components/Hero'
 import Service from './Components/Service'
 import Menue from './Components/Menue'
+import Reservation from './Components/Reservation'
+import Footer from './Components/Footer'
 
 function App() {
 
@@ -13,6 +15,8 @@ function App() {
       <Hero/>
       <Service/>
       <Menue/>
+      <Reservation/>
+      <Footer/>
     </>
   )
 }
