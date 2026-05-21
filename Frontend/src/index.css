@@ -1,0 +1,21 @@
+@import "tailwindcss";
+body{
+    background:rgb(14,13,12);
+    color:white;
+}
+.bg{
+    background: rgb(26,27,28);
+}
+.bg2{
+    background: rgb(14,13,12);;
+}
+.bg3{
+    background-color: rgb(14,13,12);
+    background-image: repeating-linear-gradient(
+        135deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 6px
+    );
+}

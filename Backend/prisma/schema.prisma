@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  role              Role      @default(USER)
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
+
+  // Audit Fields
+  created_by        Int?
+  updated_by        Int?
+  deleted_by        Int?
+
+  // Self-Relations for Audit Trail
+  creator           User?     @relation("UserCreator", fields: [created_by], references: [id])
+  updater           User?     @relation("UserUpdater", fields: [updated_by], references: [id])
+  deleter           User?     @relation("UserDeleter", fields: [deleted_by], references: [id])
+  
+  created_users     User[]    @relation("UserCreator")
+  updated_users     User[]    @relation("UserUpdater")
+  deleted_users     User[]    @relation("UserDeleter")
+
+  // Application Relations
+  orders            Order[]   @relation("CustomerOrders")
+  managed_food      FoodItem[] @relation("FoodManager") // Admin who added the food
+  cart_items   CartItem[] @relation("UserCart")
+
+  @@map("users")
+}
+
+model FoodItem {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?     @db.Text
+  price       Float
+  image       String?
+  category    String?
+  is_available Boolean    @default(true)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  
+  // Audit Trail
+  created_by  Int?
+  
+  // Relations
+  admin       User?       @relation("FoodManager", fields: [created_by], references: [id])
+  order_items OrderItem[] @relation("FoodInOrders")
+  cart_items   CartItem[]  @relation("FoodInCart")
+
+  @@map("food_items")
+}
+
+model CartItem {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  food_item_id Int
+  quantity     Int      @default(1)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  user      User     @relation("UserCart", fields: [userId], references: [id])
+  food_item FoodItem @relation("FoodInCart", fields: [food_item_id], references: [id])
+
+  // This allows the 'upsert' logic: unique pair of user + food item
+  @@unique([userId, food_item_id])
+  @@map("cart_items")
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  order_no     String      @unique // e.g., ORD-12345
+  user_id      Int
+  total_amount Float
+  status       OrderStatus @default(PENDING)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  // Relations
+  customer     User        @relation("CustomerOrders", fields: [user_id], references: [id])
+  items        OrderItem[] @relation("OrderLineItems")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           Int      @id @default(autoincrement())
+  order_id     Int
+  food_item_id Int
+  quantity     Int
+  unit_price   Float    // Historical price at the moment of order
+
+  // Relations
+  order        Order    @relation("OrderLineItems", fields: [order_id], references: [id])
+  food_item    FoodItem @relation("FoodInOrders", fields: [food_item_id], references: [id])
+
+  @@map("order_items")
+}
